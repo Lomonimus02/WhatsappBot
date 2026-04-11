@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Bot Admin - Bookings</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('layout') %>
+  <main class="content">
+    <div class="page-header">
+      <h1>Bookings</h1>
+    </div>
+
+    <% if (bookings.length === 0) { %>
+      <div class="empty-state">
+        <p>No bookings yet. Bookings will appear here when guests make them via WhatsApp.</p>
+      </div>
+    <% } else { %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Guest</th>
+            <th>Phone</th>
+            <th>Room</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Guests</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (const b of bookings) { %>
+          <tr>
+            <td><%= b.id %></td>
+            <td><strong><%= b.guest_name %></strong></td>
+            <td><%= b.guest_phone %></td>
+            <td><%= b.room_name || 'N/A' %></td>
+            <td><%= b.check_in %></td>
+            <td><%= b.check_out %></td>
+            <td><%= b.guests_count %></td>
+            <td>$<%= b.total_price ? b.total_price.toFixed(2) : '0.00' %></td>
+            <td>
+              <span class="badge badge-<%= b.status === 'confirmed' ? 'success' : b.status === 'pending' ? 'warning' : b.status === 'cancelled' ? 'error' : 'info' %>">
+                <%= b.status %>
+              </span>
+            </td>
+            <td class="actions">
+              <form method="POST" action="/admin/bookings/<%= b.id %>/status" class="inline">
+                <select name="status" onchange="this.form.submit()">
+                  <option value="pending" <%= b.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                  <option value="confirmed" <%= b.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                  <option value="cancelled" <%= b.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                  <option value="completed" <%= b.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                </select>
+              </form>
+              <form method="POST" action="/admin/bookings/<%= b.id %>/delete" class="inline"
+                    onsubmit="return confirm('Delete this booking?')">
+                <button type="submit" class="btn btn-sm btn-danger">×</button>
+              </form>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    <% } %>
+  </main>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

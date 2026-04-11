@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Bot Admin - Rooms</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('layout') %>
+  <main class="content">
+    <div class="page-header">
+      <h1>Rooms</h1>
+      <a href="/admin/rooms/new" class="btn btn-primary">+ New Room</a>
+    </div>
+
+    <% if (rooms.length === 0) { %>
+      <div class="empty-state">
+        <p>No rooms configured yet.</p>
+        <a href="/admin/rooms/new" class="btn btn-primary">Create first room</a>
+      </div>
+    <% } else { %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Price/Night</th>
+            <th>Capacity</th>
+            <th>Units</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (const room of rooms) { %>
+          <tr>
+            <td><strong><%= room.name %></strong></td>
+            <td><%= room.type %></td>
+            <td>$<%= room.price_per_night.toFixed(2) %></td>
+            <td><%= room.capacity %></td>
+            <td><%= room.total_units %></td>
+            <td>
+              <span class="badge badge-<%= room.is_active ? 'success' : 'error' %>">
+                <%= room.is_active ? 'Active' : 'Inactive' %>
+              </span>
+            </td>
+            <td class="actions">
+              <a href="/admin/rooms/<%= room.id %>/edit" class="btn btn-sm">Edit</a>
+              <form method="POST" action="/admin/rooms/<%= room.id %>/delete" class="inline"
+                    onsubmit="return confirm('Delete this room?')">
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    <% } %>
+  </main>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

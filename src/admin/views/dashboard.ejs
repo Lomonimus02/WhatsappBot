@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Bot Admin - Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('layout') %>
+  <main class="content">
+    <h1>Dashboard</h1>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number"><%= stats.rooms %></div>
+        <div class="stat-label">Active Rooms</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number"><%= stats.bookings %></div>
+        <div class="stat-label">Total Bookings</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-number"><%= stats.pending %></div>
+        <div class="stat-label">Pending Bookings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number"><%= stats.conversations %></div>
+        <div class="stat-label">Conversations</div>
+      </div>
+    </div>
+
+    <div class="cards-row">
+      <div class="card">
+        <h3>System Status</h3>
+        <div class="status-item">
+          <span>WhatsApp:</span>
+          <% if (whatsapp.isReady) { %>
+            <span class="badge badge-success">Connected</span>
+          <% } else { %>
+            <span class="badge badge-warning">Disconnected</span>
+          <% } %>
+        </div>
+        <div class="status-item">
+          <span>Ollama LLM:</span>
+          <% if (ollama.ok) { %>
+            <span class="badge badge-success">Active</span>
+          <% } else { %>
+            <span class="badge badge-error">Inactive</span>
+          <% } %>
+        </div>
+        <% if (ollama.ok && !ollama.hasModel) { %>
+          <div class="alert alert-warning">
+            ⚠️ Model not found. Run: <code>ollama pull llama3.1:8b</code>
+          </div>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <h3>Recent Bookings</h3>
+        <% if (recentBookings.length === 0) { %>
+          <p class="text-muted">No bookings yet</p>
+        <% } else { %>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Room</th>
+                <th>Dates</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for (const b of recentBookings.slice(0, 5)) { %>
+              <tr>
+                <td><%= b.guest_name %></td>
+                <td><%= b.room_name || 'N/A' %></td>
+                <td><%= b.check_in %> → <%= b.check_out %></td>
+                <td>
+                  <span class="badge badge-<%= b.status === 'confirmed' ? 'success' : b.status === 'pending' ? 'warning' : b.status === 'cancelled' ? 'error' : 'info' %>">
+                    <%= b.status %>
+                  </span>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        <% } %>
+      </div>
+    </div>
+  </main>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Bot Admin - WhatsApp</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('layout') %>
+  <main class="content">
+    <div class="page-header">
+      <h1>WhatsApp Status</h1>
+    </div>
+
+    <div class="cards-row">
+      <div class="card">
+        <h3>📱 WhatsApp Connection</h3>
+        <% if (status.isReady) { %>
+          <div class="status-connected">
+            <span class="badge badge-success">Connected</span>
+            <% if (status.info) { %>
+              <p>Name: <strong><%= status.info.pushname %></strong></p>
+              <p>Phone: <strong><%= status.info.phone %></strong></p>
+            <% } %>
+          </div>
+        <% } else if (status.qrCode) { %>
+          <div class="qr-section">
+            <p>Scan this QR code with WhatsApp:</p>
+            <div id="qr-container">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=<%= encodeURIComponent(status.qrCode) %>" alt="QR Code" class="qr-image">
+            </div>
+            <p class="text-muted">Open WhatsApp → Linked Devices → Link a Device</p>
+          </div>
+        <% } else { %>
+          <div class="status-disconnected">
+            <span class="badge badge-warning">Waiting for connection...</span>
+            <p>The QR code will appear here when ready.</p>
+          </div>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <h3>🤖 Ollama (LLM) Status</h3>
+        <% if (ollama.ok) { %>
+          <span class="badge badge-success">Active</span>
+          <% if (ollama.hasModel) { %>
+            <p>✅ Model available</p>
+          <% } else { %>
+            <div class="alert alert-warning">
+              ⚠️ Model not found.<br>
+              Run in terminal: <code>ollama pull llama3.1:8b</code>
+            </div>
+          <% } %>
+          <% if (ollama.models && ollama.models.length > 0) { %>
+            <p>Installed models:</p>
+            <ul>
+              <% for (const m of ollama.models) { %>
+                <li><%= m %></li>
+              <% } %>
+            </ul>
+          <% } %>
+        <% } else { %>
+          <span class="badge badge-error">Inactive</span>
+          <div class="alert alert-error">
+            Ollama is not running.<br>
+            1. Install from <a href="https://ollama.ai" target="_blank">ollama.ai</a><br>
+            2. Run: <code>ollama serve</code><br>
+            3. Download model: <code>ollama pull llama3.1:8b</code>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </main>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

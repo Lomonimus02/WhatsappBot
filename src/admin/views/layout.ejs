@@ -1,0 +1,30 @@
+<% /* This file is used as a partial include for navigation */ %>
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <h2>🏨 Hotel Bot</h2>
+    <span class="admin-name"><%= admin %></span>
+  </div>
+  <ul class="nav-menu">
+    <li class="<%= page === 'dashboard' ? 'active' : '' %>">
+      <a href="/admin">📊 Dashboard</a>
+    </li>
+    <li class="<%= page === 'rooms' ? 'active' : '' %>">
+      <a href="/admin/rooms">🛏️ Rooms</a>
+    </li>
+    <li class="<%= page === 'bookings' ? 'active' : '' %>">
+      <a href="/admin/bookings">📅 Bookings</a>
+    </li>
+    <li class="<%= page === 'hotel-info' ? 'active' : '' %>">
+      <a href="/admin/hotel-info">ℹ️ Hotel Info</a>
+    </li>
+    <li class="<%= page === 'faqs' ? 'active' : '' %>">
+      <a href="/admin/faqs">❓ FAQs</a>
+    </li>
+    <li class="<%= page === 'whatsapp' ? 'active' : '' %>">
+      <a href="/admin/whatsapp">📱 WhatsApp</a>
+    </li>
+    <li>
+      <a href="/admin/logout" class="logout">🚪 Logout</a>
+    </li>
+  </ul>
+</nav>

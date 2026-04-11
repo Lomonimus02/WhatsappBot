@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Bot Admin - Hotel Info</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('layout') %>
+  <main class="content">
+    <div class="page-header">
+      <h1>Hotel Information</h1>
+    </div>
+
+    <p class="text-muted">
+      This information is used by the bot to answer questions about the hotel.
+      Fill in all languages for the best experience.
+    </p>
+
+    <form method="POST" action="/admin/hotel-info" class="form-card">
+      <% for (const item of info) { %>
+        <div class="info-block">
+          <h3><%= item.label || item.key %></h3>
+          <div class="form-row three-cols">
+            <div class="form-group">
+              <label>🇪🇸 Español</label>
+              <% if (['description', 'policies', 'amenities', 'location_info', 'transport_info', 'cancellation_policy'].includes(item.key)) { %>
+                <textarea name="<%= item.key %>_es" rows="3"><%= item.value_es %></textarea>
+              <% } else { %>
+                <input type="text" name="<%= item.key %>_es" value="<%= item.value_es %>">
+              <% } %>
+            </div>
+            <div class="form-group">
+              <label>🇬🇧 English</label>
+              <% if (['description', 'policies', 'amenities', 'location_info', 'transport_info', 'cancellation_policy'].includes(item.key)) { %>
+                <textarea name="<%= item.key %>_en" rows="3"><%= item.value_en %></textarea>
+              <% } else { %>
+                <input type="text" name="<%= item.key %>_en" value="<%= item.value_en %>">
+              <% } %>
+            </div>
+            <div class="form-group">
+              <label>🇧🇷 Português</label>
+              <% if (['description', 'policies', 'amenities', 'location_info', 'transport_info', 'cancellation_policy'].includes(item.key)) { %>
+                <textarea name="<%= item.key %>_pt" rows="3"><%= item.value_pt %></textarea>
+              <% } else { %>
+                <input type="text" name="<%= item.key %>_pt" value="<%= item.value_pt %>">
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save All</button>
+      </div>
+    </form>
+  </main>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

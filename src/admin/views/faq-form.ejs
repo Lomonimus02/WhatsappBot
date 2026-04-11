@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Bot Admin - <%= faq ? 'Edit' : 'New' %> FAQ</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('layout') %>
+  <main class="content">
+    <div class="page-header">
+      <h1><%= faq ? 'Edit' : 'New' %> FAQ</h1>
+      <a href="/admin/faqs" class="btn">← Back</a>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <form method="POST" action="/admin/faqs" class="form-card">
+      <% if (faq && faq.id) { %>
+        <input type="hidden" name="id" value="<%= faq.id %>">
+      <% } %>
+
+      <h3>🇪🇸 Español</h3>
+      <div class="form-group">
+        <label>Question</label>
+        <input type="text" name="question_es" value="<%= faq ? faq.question_es : '' %>">
+      </div>
+      <div class="form-group">
+        <label>Answer</label>
+        <textarea name="answer_es" rows="3"><%= faq ? faq.answer_es : '' %></textarea>
+      </div>
+
+      <h3>🇬🇧 English</h3>
+      <div class="form-group">
+        <label>Question</label>
+        <input type="text" name="question_en" value="<%= faq ? faq.question_en : '' %>">
+      </div>
+      <div class="form-group">
+        <label>Answer</label>
+        <textarea name="answer_en" rows="3"><%= faq ? faq.answer_en : '' %></textarea>
+      </div>
+
+      <h3>🇧🇷 Português</h3>
+      <div class="form-group">
+        <label>Pergunta</label>
+        <input type="text" name="question_pt" value="<%= faq ? faq.question_pt : '' %>">
+      </div>
+      <div class="form-group">
+        <label>Resposta</label>
+        <textarea name="answer_pt" rows="3"><%= faq ? faq.answer_pt : '' %></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Order</label>
+          <input type="number" name="sort_order" value="<%= faq ? faq.sort_order : 0 %>">
+        </div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" name="is_active" value="1"
+                   <%= (!faq || faq.is_active) ? 'checked' : '' %>>
+            Active
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="/admin/faqs" class="btn">Cancel</a>
+      </div>
+    </form>
+  </main>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Bot Admin - FAQs</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('layout') %>
+  <main class="content">
+    <div class="page-header">
+      <h1>Frequently Asked Questions</h1>
+      <a href="/admin/faqs/new" class="btn btn-primary">+ New FAQ</a>
+    </div>
+
+    <p class="text-muted">
+      FAQs help the bot answer common guest questions accurately.
+    </p>
+
+    <% if (faqs.length === 0) { %>
+      <div class="empty-state">
+        <p>No FAQs configured yet.</p>
+        <a href="/admin/faqs/new" class="btn btn-primary">Create first FAQ</a>
+      </div>
+    <% } else { %>
+      <div class="faq-list">
+        <% for (const faq of faqs) { %>
+          <div class="faq-card">
+            <div class="faq-header">
+              <span class="badge badge-<%= faq.is_active ? 'success' : 'error' %>">
+                <%= faq.is_active ? 'Active' : 'Inactive' %>
+              </span>
+              <span class="faq-order">Order: <%= faq.sort_order %></span>
+            </div>
+            <div class="faq-content">
+              <p><strong>🇪🇸</strong> <%= faq.question_es || '(empty)' %></p>
+              <p class="text-muted"><%= faq.answer_es ? faq.answer_es.substring(0, 100) + '...' : '' %></p>
+            </div>
+            <div class="faq-actions">
+              <a href="/admin/faqs/<%= faq.id %>/edit" class="btn btn-sm">Edit</a>
+              <form method="POST" action="/admin/faqs/<%= faq.id %>/delete" class="inline"
+                    onsubmit="return confirm('Delete this FAQ?')">
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+  </main>
+  <script src="/js/admin.js"></script>
+</body>
+</html>
