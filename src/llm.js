@@ -4,12 +4,22 @@ const API_KEY = config.openrouter.apiKey;
 const MODEL = config.openrouter.model;
 const BASE_URL = 'https://openrouter.ai/api/v1';
 
+const FALLBACK_MODELS = [
+  config.openrouter.model,
+  'google/gemma-4-31b-it:free',
+  'google/gemma-3-12b-it:free',
+  'google/gemma-3-4b-it:free',
+  'openai/gpt-oss-20b:free',
+  'nvidia/nemotron-nano-12b-v2-vl:free',
+  'qwen/qwen3-next-80b-a3b-instruct:free',
+];
+
 /**
  * Send a chat completion request to Gemini API
  */
-async function chat(systemPrompt, messages, options = {}) {
+async function callModel(model, systemPrompt, messages, options = {}) {
   const body = {
-    model: MODEL,
+    model,
     messages: [
       { role: 'system', content: systemPrompt },
       ...messages.map(m => ({ role: m.role, content: m.message || m.content })),
@@ -31,11 +41,33 @@ async function chat(systemPrompt, messages, options = {}) {
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`OpenRouter error ${response.status}: ${text}`);
+    const err = new Error(`OpenRouter error ${response.status}: ${text}`);
+    err.status = response.status;
+    throw err;
   }
 
   const data = await response.json();
   return data.choices?.[0]?.message?.content || '';
+}
+
+async function chat(systemPrompt, messages, options = {}) {
+  const tried = new Set();
+  const models = [...new Set([MODEL, ...FALLBACK_MODELS])];
+
+  for (const model of models) {
+    if (tried.has(model)) continue;
+    tried.add(model);
+    try {
+      return await callModel(model, systemPrompt, messages, options);
+    } catch (err) {
+      if (err.status === 429 || err.status === 404) {
+        // try next model
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error('All models are rate-limited or unavailable');
 }
 
 /**
