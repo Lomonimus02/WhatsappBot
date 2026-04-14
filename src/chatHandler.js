@@ -37,24 +37,29 @@ function buildSystemPrompt(language) {
   // Hotel info
   const hotelInfo = queries.getAllHotelInfo.all();
   const infoMap = {};
+  const fallbackLang = lang === 'es' ? 'en' : 'es';
+  const fallbackSuffix = `_${fallbackLang}`;
   for (const item of hotelInfo) {
-    infoMap[item.key] = item[`value${langSuffix}`] || item.value_es || item.value_en || '';
+    infoMap[item.key] = item[`value${langSuffix}`] || item[`value${fallbackSuffix}`] || item.value_en || item.value_es || '';
   }
 
   // Rooms
   const rooms = queries.getActiveRooms.all();
+  const nightLabel = { es: 'noche', en: 'night', pt: 'noite' }[lang] || 'night';
+  const capacityLabel = { es: 'Capacidad', en: 'Capacity', pt: 'Capacidade' }[lang] || 'Capacity';
+  const amenitiesLabel = { es: 'Amenidades', en: 'Amenities', pt: 'Comodidades' }[lang] || 'Amenities';
   const roomDescriptions = rooms.map(r => {
-    const desc = r[`description${langSuffix}`] || r.description_es || r.description_en || '';
+    const desc = r[`description${langSuffix}`] || r[`description${fallbackSuffix}`] || r.description_en || r.description_es || '';
     let amenities = '';
     try { amenities = JSON.parse(r.amenities).join(', '); } catch { amenities = r.amenities; }
-    return `- ${r.name} (${r.type}): $${r.price_per_night}/noche | Capacidad: ${r.capacity} | ${desc}${amenities ? ' | Amenidades: ' + amenities : ''}`;
+    return `- ${r.name} (${r.type}): $${r.price_per_night}/${nightLabel} | ${capacityLabel}: ${r.capacity} | ${desc}${amenities ? ' | ' + amenitiesLabel + ': ' + amenities : ''}`;
   }).join('\n');
 
   // FAQs
   const faqs = queries.getActiveFaqs.all();
   const faqText = faqs.map(f => {
-    const q = f[`question${langSuffix}`] || f.question_es || '';
-    const a = f[`answer${langSuffix}`] || f.answer_es || '';
+    const q = f[`question${langSuffix}`] || f[`question${fallbackSuffix}`] || f.question_en || f.question_es || '';
+    const a = f[`answer${langSuffix}`] || f[`answer${fallbackSuffix}`] || f.answer_en || f.answer_es || '';
     return q && a ? `Q: ${q}\nA: ${a}` : '';
   }).filter(Boolean).join('\n\n');
 
@@ -74,7 +79,7 @@ function buildSystemPrompt(language) {
   if (infoMap.payment_methods) infoLines.push(`Payment: ${infoMap.payment_methods}`);
   if (infoMap.cancellation_policy) infoLines.push(`Cancellation: ${infoMap.cancellation_policy}`);
 
-  return `You are a friendly hotel receptionist at "${infoMap.hotel_name || 'our hotel'}". Reply ALWAYS in ${langName}. Be warm and natural like a real human. NEVER say you are AI or a bot.
+  return `You are a friendly hotel receptionist at "${infoMap.hotel_name || 'our hotel'}". You MUST reply ONLY in ${langName}. This is MANDATORY — every single word of your response must be in ${langName}, regardless of the language of the data below. Be warm and natural like a real human. NEVER say you are AI or a bot.
 
 HOTEL INFO:
 ${infoLines.join('\n')}
