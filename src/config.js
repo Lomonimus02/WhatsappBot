@@ -1,9 +1,9 @@
 require('dotenv').config();
 
 module.exports = {
-  ollama: {
-    url: process.env.OLLAMA_URL || 'http://localhost:11434',
-    model: process.env.OLLAMA_MODEL || 'llama3.1:8b',
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || '',
+    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
   },
   admin: {
     port: parseInt(process.env.ADMIN_PORT) || 3000,

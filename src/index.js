@@ -49,19 +49,14 @@ async function start() {
     console.log('   ⚠️  Change the password after first login!\n');
   }
 
-  // Check Ollama
-  const ollama = await healthCheck();
-  if (ollama.ok) {
-    console.log('🤖 Ollama is active');
-    if (ollama.hasModel) {
-      console.log(`   Model: ${config.ollama.model} ✅`);
-    } else {
-      console.log(`   ⚠️  Model ${config.ollama.model} not found.`);
-      console.log(`   Run: ollama pull ${config.ollama.model}`);
-    }
+  // Check Gemini
+  const gemini = await healthCheck();
+  if (gemini.ok) {
+    console.log('🤖 Gemini API is active');
+    console.log(`   Model: ${gemini.displayName || config.gemini.model} ✅`);
   } else {
-    console.log('⚠️  Ollama is not running. Install from https://ollama.ai');
-    console.log('   Then run: ollama serve');
+    console.log('⚠️  Gemini API error:', gemini.error);
+    console.log('   Set GEMINI_API_KEY in .env');
   }
 
   // Start Express

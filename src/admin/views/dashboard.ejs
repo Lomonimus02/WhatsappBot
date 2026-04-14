@@ -42,18 +42,13 @@
           <% } %>
         </div>
         <div class="status-item">
-          <span>Ollama LLM:</span>
+          <span>Gemini LLM:</span>
           <% if (ollama.ok) { %>
-            <span class="badge badge-success">Active</span>
+            <span class="badge badge-success">Active (<%= ollama.displayName || 'Gemini' %>)</span>
           <% } else { %>
             <span class="badge badge-error">Inactive</span>
           <% } %>
         </div>
-        <% if (ollama.ok && !ollama.hasModel) { %>
-          <div class="alert alert-warning">
-            ⚠️ Model not found. Run: <code>ollama pull llama3.1:8b</code>
-          </div>
-        <% } %>
       </div>
 
       <div class="card">

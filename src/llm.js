@@ -1,65 +1,71 @@
 const config = require('./config');
 
-const OLLAMA_URL = config.ollama.url;
-const MODEL = config.ollama.model;
+const API_KEY = config.gemini.apiKey;
+const MODEL = config.gemini.model;
+const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
 /**
- * Send a chat completion request to Ollama
+ * Send a chat completion request to Gemini API
  */
 async function chat(systemPrompt, messages, options = {}) {
-  const ollamaMessages = [
-    { role: 'system', content: systemPrompt },
-    ...messages.map(m => ({ role: m.role, content: m.message || m.content })),
-  ];
+  const contents = messages.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.message || m.content }],
+  }));
 
   const body = {
-    model: MODEL,
-    messages: ollamaMessages,
-    stream: false,
-    options: {
+    contents,
+    systemInstruction: {
+      parts: [{ text: systemPrompt }],
+    },
+    generationConfig: {
       temperature: options.temperature || 0.7,
-      num_predict: options.maxTokens || 300,
-      top_p: 0.9,
-      num_ctx: 2048,
+      maxOutputTokens: options.maxTokens || 300,
+      topP: 0.9,
     },
   };
 
-  const response = await fetch(`${OLLAMA_URL}/api/chat`, {
+  const url = `${BASE_URL}/models/${MODEL}:generateContent?key=${API_KEY}`;
+  const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(120000),
+    signal: AbortSignal.timeout(30000),
   });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Ollama error ${response.status}: ${text}`);
+    throw new Error(`Gemini error ${response.status}: ${text}`);
   }
 
   const data = await response.json();
-  return data.message?.content || '';
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
 
 /**
- * Check if Ollama is running and the model is available
+ * Check if Gemini API is accessible
  */
 async function healthCheck() {
   try {
-    const res = await fetch(`${OLLAMA_URL}/api/tags`, {
+    if (!API_KEY) {
+      return { ok: false, error: 'GEMINI_API_KEY not set' };
+    }
+
+    const url = `${BASE_URL}/models/${MODEL}?key=${API_KEY}`;
+    const res = await fetch(url, {
       signal: AbortSignal.timeout(5000),
     });
-    if (!res.ok) return { ok: false, error: 'Ollama not responding' };
+
+    if (!res.ok) {
+      const text = await res.text();
+      return { ok: false, error: `Gemini API error: ${text}` };
+    }
 
     const data = await res.json();
-    const modelName = MODEL.split(':')[0];
-    const hasModel = data.models?.some(m =>
-      m.name === MODEL || m.name.startsWith(modelName)
-    );
-
     return {
       ok: true,
-      hasModel,
-      models: data.models?.map(m => m.name) || [],
+      model: data.name || MODEL,
+      displayName: data.displayName || MODEL,
     };
   } catch (err) {
     return { ok: false, error: err.message };

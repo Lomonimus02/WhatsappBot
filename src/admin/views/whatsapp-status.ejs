@@ -41,32 +41,16 @@
       </div>
 
       <div class="card">
-        <h3>🤖 Ollama (LLM) Status</h3>
+        <h3>🤖 Gemini (LLM) Status</h3>
         <% if (ollama.ok) { %>
           <span class="badge badge-success">Active</span>
-          <% if (ollama.hasModel) { %>
-            <p>✅ Model available</p>
-          <% } else { %>
-            <div class="alert alert-warning">
-              ⚠️ Model not found.<br>
-              Run in terminal: <code>ollama pull llama3.1:8b</code>
-            </div>
-          <% } %>
-          <% if (ollama.models && ollama.models.length > 0) { %>
-            <p>Installed models:</p>
-            <ul>
-              <% for (const m of ollama.models) { %>
-                <li><%= m %></li>
-              <% } %>
-            </ul>
-          <% } %>
+          <p>✅ Model: <%= ollama.displayName || ollama.model || 'Gemini' %></p>
         <% } else { %>
           <span class="badge badge-error">Inactive</span>
           <div class="alert alert-error">
-            Ollama is not running.<br>
-            1. Install from <a href="https://ollama.ai" target="_blank">ollama.ai</a><br>
-            2. Run: <code>ollama serve</code><br>
-            3. Download model: <code>ollama pull llama3.1:8b</code>
+            Gemini API is not available.<br>
+            Set <code>GEMINI_API_KEY</code> in .env file.<br>
+            Get a key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a>
           </div>
         <% } %>
       </div>
