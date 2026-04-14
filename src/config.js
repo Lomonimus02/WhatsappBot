@@ -1,9 +1,9 @@
 require('dotenv').config();
 
 module.exports = {
-  gemini: {
-    apiKey: process.env.GEMINI_API_KEY || '',
-    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
+  openrouter: {
+    apiKey: process.env.OPENROUTER_API_KEY || '',
+    model: process.env.OPENROUTER_MODEL || 'google/gemma-3-27b-it:free',
   },
   admin: {
     port: parseInt(process.env.ADMIN_PORT) || 3000,

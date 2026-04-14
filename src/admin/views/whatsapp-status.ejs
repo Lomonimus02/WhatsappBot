@@ -41,16 +41,16 @@
       </div>
 
       <div class="card">
-        <h3>🤖 Gemini (LLM) Status</h3>
+        <h3>🤖 OpenRouter (LLM) Status</h3>
         <% if (ollama.ok) { %>
           <span class="badge badge-success">Active</span>
-          <p>✅ Model: <%= ollama.displayName || ollama.model || 'Gemini' %></p>
+          <p>✅ Model: <%= ollama.displayName || ollama.model || 'OpenRouter' %></p>
         <% } else { %>
           <span class="badge badge-error">Inactive</span>
           <div class="alert alert-error">
-            Gemini API is not available.<br>
-            Set <code>GEMINI_API_KEY</code> in .env file.<br>
-            Get a key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a>
+            OpenRouter API is not available.<br>
+            Set <code>OPENROUTER_API_KEY</code> in .env file.<br>
+            Get a key at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a>
           </div>
         <% } %>
       </div>

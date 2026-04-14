@@ -1,45 +1,41 @@
 const config = require('./config');
 
-const API_KEY = config.gemini.apiKey;
-const MODEL = config.gemini.model;
-const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
+const API_KEY = config.openrouter.apiKey;
+const MODEL = config.openrouter.model;
+const BASE_URL = 'https://openrouter.ai/api/v1';
 
 /**
  * Send a chat completion request to Gemini API
  */
 async function chat(systemPrompt, messages, options = {}) {
-  const contents = messages.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.message || m.content }],
-  }));
-
   const body = {
-    contents,
-    systemInstruction: {
-      parts: [{ text: systemPrompt }],
-    },
-    generationConfig: {
-      temperature: options.temperature || 0.7,
-      maxOutputTokens: options.maxTokens || 300,
-      topP: 0.9,
-    },
+    model: MODEL,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      ...messages.map(m => ({ role: m.role, content: m.message || m.content })),
+    ],
+    max_tokens: options.maxTokens || 300,
+    temperature: options.temperature || 0.7,
   };
 
-  const url = `${BASE_URL}/models/${MODEL}:generateContent?key=${API_KEY}`;
-  const response = await fetch(url, {
+  const response = await fetch(`${BASE_URL}/chat/completions`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`,
+      'HTTP-Referer': 'https://github.com/Lomonimus02/WhatsappBot',
+    },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(30000),
   });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Gemini error ${response.status}: ${text}`);
+    throw new Error(`OpenRouter error ${response.status}: ${text}`);
   }
 
   const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  return data.choices?.[0]?.message?.content || '';
 }
 
 /**
@@ -48,25 +44,20 @@ async function chat(systemPrompt, messages, options = {}) {
 async function healthCheck() {
   try {
     if (!API_KEY) {
-      return { ok: false, error: 'GEMINI_API_KEY not set' };
+      return { ok: false, error: 'OPENROUTER_API_KEY not set' };
     }
 
-    const url = `${BASE_URL}/models/${MODEL}?key=${API_KEY}`;
-    const res = await fetch(url, {
+    const res = await fetch(`${BASE_URL}/models`, {
+      headers: { 'Authorization': `Bearer ${API_KEY}` },
       signal: AbortSignal.timeout(5000),
     });
 
     if (!res.ok) {
       const text = await res.text();
-      return { ok: false, error: `Gemini API error: ${text}` };
+      return { ok: false, error: `OpenRouter API error: ${text}` };
     }
 
-    const data = await res.json();
-    return {
-      ok: true,
-      model: data.name || MODEL,
-      displayName: data.displayName || MODEL,
-    };
+    return { ok: true, model: MODEL, displayName: MODEL };
   } catch (err) {
     return { ok: false, error: err.message };
   }

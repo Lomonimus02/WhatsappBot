@@ -49,14 +49,14 @@ async function start() {
     console.log('   ⚠️  Change the password after first login!\n');
   }
 
-  // Check Gemini
-  const gemini = await healthCheck();
-  if (gemini.ok) {
-    console.log('🤖 Gemini API is active');
-    console.log(`   Model: ${gemini.displayName || config.gemini.model} ✅`);
+  // Check OpenRouter
+  const llmStatus = await healthCheck();
+  if (llmStatus.ok) {
+    console.log('🤖 OpenRouter API is active');
+    console.log(`   Model: ${config.openrouter.model} ✅`);
   } else {
-    console.log('⚠️  Gemini API error:', gemini.error);
-    console.log('   Set GEMINI_API_KEY in .env');
+    console.log('⚠️  OpenRouter API error:', llmStatus.error);
+    console.log('   Set OPENROUTER_API_KEY in .env');
   }
 
   // Start Express
